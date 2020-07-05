@@ -85,7 +85,7 @@ export default {
 
 ## Authors ✒️
 
-* **Christian Rodriguez** - *Inforser* - [crod](crodriguez@inforser.cl)
+* **Christian Rodriguez** - *Inforser* - [crod](mailto:crodriguez@inforser.cl)
 
 
 ## Licence 📄
@@ -97,4 +97,4 @@ MIT
 * Thanks for read this readme! 📢
 
 ---
-⌨️ with ❤️ for [crod-inforser](crodriguez@inforser.cl) 😊
+⌨️ with ❤️ for [crod-inforser](mailto:crodriguez@inforser.cl) 😊
