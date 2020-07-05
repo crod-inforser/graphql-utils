@@ -1,12 +1,13 @@
-import { existsSync } from "https://deno.land/std/fs/exists.ts";
+import { exists } from "https://deno.land/std/fs/exists.ts";
 import { walk } from "https://deno.land/std/fs/walk.ts";
 import { readFileStr } from "https://deno.land/std/fs/read_file_str.ts";
 import { default as gql } from "https://cdn.pika.dev/graphql-tag@%5E2.10.3";
+import { join } from "https://deno.land/std/path/mod.ts";
 
 import { IDefinition, IResolver, IGql } from "../types/index.ts";
 
 async function getFileNames(dir: string, exts: string[]): Promise<string[]> {
-  if (existsSync(dir)) {
+  if (await exists(dir)) {
     const files = [];
     for await (const entry of walk(dir)) {
       if (
@@ -14,14 +15,10 @@ async function getFileNames(dir: string, exts: string[]): Promise<string[]> {
         entry.name !== "." &&
         (exts.map((ext) => entry.name.includes(ext)).includes(true))
       ) {
-        if (dir === "./") {
-          if (entry.name === entry.path) files.push(entry.name);
-        } else {
-          if (
-            entry.path.slice(dir.length - 1, entry.path.length) === entry.name
-          ) {
-            files.push(entry.name);
-          }
+        if (
+          entry.path.slice(dir.length + 1, entry.path.length) === entry.name
+        ) {
+          files.push(entry.name);
         }
       }
     }
@@ -61,7 +58,7 @@ export async function importResolvers(dir: string): Promise<IResolver> {
   const nameFiles = await getFileNames(dir, [".ts"]);
   let toReturn: IResolver = {};
   for (const name of nameFiles) {
-    const newFunctions: { default: IResolver } = await import(`${dir}/${name}`);
+    const newFunctions: { default: IResolver } = await import(join("file:\\\\"+dir, name));
     toReturn = {
       Query: {
         ...toReturn.Query,
@@ -82,7 +79,7 @@ export async function importTypedefs(dir: string): Promise<IGql> {
   let gqlFiles: string = "";
   for (const index in nameFiles) {
     const file: string = await readFileStr(
-      dir === "./" ? `./${nameFiles[index]}` : `${dir}/${nameFiles[index]}`,
+      join(dir, nameFiles[index]),
       { encoding: "utf8" },
     );
     const mygql: IGql = (gql as any)`${file}`;
